@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stock & Inventory Management Dashboard</title>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --surface: #ffffff;
+      --surface-alt: #f8fafc;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --success: #16a34a;
+      --success-bg: #dcfce7;
+      --warning: #d97706;
+      --warning-bg: #fef3c7;
+      --danger: #dc2626;
+      --danger-bg: #fee2e2;
+      --info: #0284c7;
+      --info-bg: #e0f2fe;
+      --radius: 10px;
+      --shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+    }
+
+    .brand h1 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .brand p {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .mode-pill {
+      font-size: 12px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--info-bg);
+      color: var(--info);
+      font-weight: 600;
+    }
+
+    .container {
+      max-width: 1320px;
+      margin: 22px auto;
+      padding: 0 20px 40px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      padding: 10px 16px;
+      border-radius: 8px 8px 0 0;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+      background: var(--surface-alt);
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      background: var(--surface);
+      border-color: var(--border);
+      border-bottom-color: var(--surface);
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 700;
+      margin-top: 6px;
+    }
+
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .card-header h2 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    input, select {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: 14px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .form-actions {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 7px;
+      padding: 9px 15px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: var(--surface-alt);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: #eef2f6;
+    }
+
+    .btn-danger {
+      background: var(--danger-bg);
+      color: var(--danger);
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .btn-xs {
+      padding: 3px 8px;
+      font-size: 12px;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .btn-xs:hover {
+      background: #e2e8f0;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    th, td {
+      padding: 11px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th {
+      background: var(--surface-alt);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    tr:hover td {
+      background: #fafcff;
+    }
+
+    .meter-wrap {
+      min-width: 140px;
+    }
+
+    .meter-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .meter-bar {
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .meter-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+
+    .fill-active { background: var(--success); }
+    .fill-low { background: var(--warning); }
+    .fill-out { background: var(--danger); }
+
+    .qty-stepper {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+
+    .badge-active { background: var(--success-bg); color: var(--success); }
+    .badge-low { background: var(--warning-bg); color: var(--warning); }
+    .badge-out { background: var(--danger-bg); color: var(--danger); }
+    .badge-source { background: var(--info-bg); color: var(--info); }
+    .badge-in { background: var(--success-bg); color: var(--success); }
+    .badge-out-tx { background: var(--warning-bg); color: var(--warning); }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .variance-box {
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      font-size: 13.5px;
+      margin-top: 14px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--text);
+      color: #fff;
+      padding: 11px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: all 0.2s ease;
+      z-index: 50;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .empty-row {
+      text-align: center;
+      color: var(--muted);
+      padding: 24px !important;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-badge">IM</div>
+      <div>
+        <h1>Stock & Inventory Management</h1>
+        <p>Items • Transactions • Quantity Measurement • Active Tracking</p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <span class="mode-pill" id="storageModeBadge">Local Demo Storage</span>
+      <button class="btn btn-secondary" type="button" id="resetDemoBtn">Reset Sample Data</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="tabs" role="tablist" aria-label="Inventory Tabs">
+      <button class="tab-btn active" data-tab="dashboard" role="tab">Dashboard</button>
+      <button class="tab-btn" data-tab="items" role="tab">Items</button>
+      <button class="tab-btn" data-tab="transactions" role="tab">Transactions</button>
+      <button class="tab-btn" data-tab="quantity-measure" role="tab">Quantity Measurement & Audit</button>
+      <button class="tab-btn" data-tab="transactions-tracking" role="tab">Transaction Details & Active Tracking</button>
+    </nav>
+
+    <!-- TAB 1: DASHBOARD -->
+    <section id="dashboard" class="tab-panel active" role="tabpanel">
+      <div class="kpi-grid">
+        <div class="card">
+          <div class="kpi-label">Total Items (Part Nos)</div>
+          <div class="kpi-value" id="kpiTotalItems">0</div>
+          <div class="kpi-sub">Registered in Items</div>
+        </div>
+        <div class="card">
+          <div class="kpi-label">Overall Capacity Fill</div>
+          <div class="kpi-value" id="kpiCapacityFill">0%</div>
+          <div class="kpi-sub" id="kpiCapacityDetail">0 / 0 total capacity units</div>
+        </div>
+        <div class="card">
+          <div class="kpi-label">Total Inventory Value</div>
+          <div class="kpi-value" id="kpiTotalValue">₹0.00</div>
+          <div class="kpi-sub">Price × Measured Quantity</div>
+        </div>
+        <div class="card">
+          <div class="kpi-label">Active / Low / Out</div>
+          <div class="kpi-value" id="kpiActiveSummary">0 / 0 / 0</div>
+          <div class="kpi-sub">Live stock status</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h2>Active Item & Quantity Gauge</h2>
+            <button class="btn btn-secondary" type="button" data-jump-tab="quantity-measure">Open Stock Count</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Part No</th>
+                  <th>Item Name</th>
+                  <th>Measured Qty</th>
+                  <th>Capacity Level</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="dashTrackingBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>Recent Transactions & Order Sources</h2>
+            <button class="btn btn-secondary" type="button" data-jump-tab="transactions-tracking">View All & Filter</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Part No</th>
+                  <th>Type</th>
+                  <th>Qty + Unit</th>
+                  <th>Order Source</th>
+                </tr>
+              </thead>
+              <tbody id="dashRecentTxBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: ITEMS -->
+    <section id="items" class="tab-panel" role="tabpanel">
+      <div class="card">
+        <div class="card-header">
+          <h2 id="itemFormTitle">Add New Item</h2>
+          <span style="font-size:12px;color:var(--muted);">Define Part No, Item Name, Price (₹), Quantity, Unit of Measure, Capacity, and Location</span>
+        </div>
+        <form id="itemForm">
+          <input type="hidden" id="editingItemId" />
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="partNo">Part No *</label>
+              <input type="text" id="partNo" placeholder="e.g. PRT-1001" required />
+            </div>
+            <div class="form-group">
+              <label for="itemName">Item Name *</label>
+              <input type="text" id="itemName" placeholder="e.g. Servo Motor 24V" required />
+            </div>
+            <div class="form-group">
+              <label for="itemPrice">Price (₹) *</label>
+              <input type="number" id="itemPrice" step="0.01" min="0" placeholder="0.00" required />
+            </div>
+            <div class="form-group">
+              <label for="itemQty">Quantity *</label>
+              <input type="number" id="itemQty" step="0.01" min="0" placeholder="0" required />
+            </div>
+            <div class="form-group">
+              <label for="itemUnit">Unit of Measure *</label>
+              <select id="itemUnit" required>
+                <option value="PCS">PCS (Pieces)</option>
+                <option value="KG">KG (Kilograms)</option>
+                <option value="MTR">MTR (Meters)</option>
+                <option value="LTR">LTR (Liters)</option>
+                <option value="BOX">BOX (Boxes)</option>
+                <option value="SET">SET (Sets)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="itemMaxCap">Max Bin Capacity *</label>
+              <input type="number" id="itemMaxCap" step="1" min="1" value="50" required />
+            </div>
+            <div class="form-group">
+              <label for="itemMinReorder">Min Reorder Level *</label>
+              <input type="number" id="itemMinReorder" step="0.01" min="0" value="5" required />
+            </div>
+            <div class="form-group">
+              <label for="itemLocation">Location *</label>
+              <input type="text" id="itemLocation" placeholder="e.g. WH-A / Rack B3" required />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit" id="saveItemBtn">Save Item</button>
+            <button class="btn btn-secondary" type="button" id="cancelEditItemBtn" style="display:none;">Cancel Edit</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <div class="card-header">
+          <h2>Items Catalog</h2>
+          <input type="search" id="itemSearchInput" placeholder="Search by Part No, Name, or Location..." style="max-width:280px;" />
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Part No</th>
+                <th>Item Name</th>
+                <th>Price (₹)</th>
+                <th>Measured Qty</th>
+                <th>Quick Adjust</th>
+                <th>Bin Fill</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="itemsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: TRANSACTIONS -->
+    <section id="transactions" class="tab-panel" role="tabpanel">
+      <div class="card">
+        <div class="card-header">
+          <h2>Transactions — Log Stock Movement</h2>
+          <span style="font-size:12px;color:var(--muted);">Automatically measures & updates Item quantity</span>
+        </div>
+        <form id="transactionForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="txItemSelect">Item (Part No & Name) *</label>
+              <select id="txItemSelect" required></select>
+            </div>
+            <div class="form-group">
+              <label for="txType">Movement Type *</label>
+              <select id="txType" required>
+                <option value="IN">Stock IN (+)</option>
+                <option value="OUT">Stock OUT (-)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="txQty" id="txQtyLabel">Quantity *</label>
+              <input type="number" id="txQty" min="0.01" step="0.01" placeholder="e.g. 10" required />
+            </div>
+            <div class="form-group">
+              <label for="txSource">Order Source *</label>
+              <select id="txSource" required>
+                <option value="SAP">SAP</option>
+                <option value="E-mail">E-mail</option>
+                <option value="Personal Request">Personal Request</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="txDate">Transaction Date *</label>
+              <input type="date" id="txDate" required />
+            </div>
+            <div class="form-group">
+              <label for="txReference">Reference / Notes</label>
+              <input type="text" id="txReference" placeholder="e.g. PO-8841 or Requester name" />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Record Transaction</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- TAB 4: QUANTITY MEASUREMENT & PHYSICAL STOCK AUDIT -->
+    <section id="quantity-measure" class="tab-panel" role="tabpanel">
+      <div class="card">
+        <div class="card-header">
+          <h2>Physical Quantity Measurement & Stock Audit</h2>
+          <span style="font-size:12px;color:var(--muted);">Measure actual warehouse stock against system records and reconcile variance</span>
+        </div>
+        <form id="auditForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="auditItemSelect">Select Item to Measure *</label>
+              <select id="auditItemSelect" required></select>
+            </div>
+            <div class="form-group">
+              <label for="auditSystemQty">System Recorded Qty</label>
+              <input type="text" id="auditSystemQty" readonly style="background:var(--surface-alt);font-weight:700;" />
+            </div>
+            <div class="form-group">
+              <label for="auditMeasuredQty">Measured / Physical Qty *</label>
+              <input type="number" id="auditMeasuredQty" step="0.01" min="0" placeholder="Enter counted quantity" required />
+            </div>
+            <div class="form-group">
+              <label for="auditSource">Verification Source *</label>
+              <select id="auditSource" required>
+                <option value="Personal Request">Personal Request (Physical Count)</option>
+                <option value="SAP">SAP Cycle Count</option>
+                <option value="E-mail">E-mail Audit Report</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="variance-box" id="auditVariancePreview">
+            <span><strong>Variance:</strong> <span id="varianceValue">0</span></span>
+            <span><strong>Value Impact:</strong> <span id="varianceMoney">₹0.00</span></span>
+            <span><strong>New Bin Fill:</strong> <span id="varianceFill">0%</span></span>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Apply Measured Quantity & Log Adjustment</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <div class="card-header">
+          <h2>Quantity Measurement Breakdown by Unit (UoM)</h2>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Unit of Measure</th>
+                <th>Item Count</th>
+                <th>Total Measured Quantity</th>
+                <th>Total Bin Capacity</th>
+                <th>Overall Fill %</th>
+                <th>Total Stock Value (₹)</th>
+              </tr>
+            </thead>
+            <tbody id="uomSummaryTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: TRANSACTION DETAILS & ACTIVE TRACKING -->
+    <section id="transactions-tracking" class="tab-panel" role="tabpanel">
+      <div class="card">
+        <div class="card-header">
+          <h2>Transaction Details — Date Range & Source Filter</h2>
+          <button class="btn btn-secondary" type="button" id="clearFiltersBtn">Clear Filters</button>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="filterFromDate">From Date</label>
+            <input type="date" id="filterFromDate" />
+          </div>
+          <div class="form-group">
+            <label for="filterToDate">To Date</label>
+            <input type="date" id="filterToDate" />
+          </div>
+          <div class="form-group">
+            <label for="filterSource">Order Source</label>
+            <select id="filterSource">
+              <option value="ALL">All Sources</option>
+              <option value="SAP">SAP</option>
+              <option value="E-mail">E-mail</option>
+              <option value="Personal Request">Personal Request</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="filterText">Part No / Item / Reference</label>
+            <input type="search" id="filterText" placeholder="Search..." />
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Tx ID</th>
+                <th>Date</th>
+                <th>Part No</th>
+                <th>Item Name</th>
+                <th>Location</th>
+                <th>Type</th>
+                <th>Measured Qty</th>
+                <th>Order Source</th>
+                <th>Stock After</th>
+                <th>Reference</th>
+              </tr>
+            </thead>
+            <tbody id="filteredTxTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <div class="card-header">
+          <h2>Active Item Tracking (Live Stock, Capacity & Location)</h2>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Part No</th>
+                <th>Item Name</th>
+                <th>Location</th>
+                <th>Unit Price (₹)</th>
+                <th>Current Qty</th>
+                <th>Capacity Meter</th>
+                <th>Stock Value (₹)</th>
+                <th>Tracking Status</th>
+              </tr>
+            </thead>
+            <tbody id="activeTrackingTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const CONFIG = {
+      USE_BACKEND: false,
+      API_ITEMS: "/Api/Items.ashx",
+      API_TRANSACTIONS: "/Api/Transactions.ashx"
+    };
+
+    const STORAGE_KEYS = {
+      ITEMS: "inv_items_inr_v1",
+      TX: "inv_transactions_inr_v1"
+    };
+
+    function todayISO() {
+      return new Date().toISOString().split("T")[0];
+    }
+
+    function daysAgoISO(days) {
+      const d = new Date();
+      d.setDate(d.getDate() - days);
+      return d.toISOString().split("T")[0];
+    }
+
+    const SAMPLE_ITEMS = [
+      { id: 1, partNo: "PRT-1001", name: "24V DC Servo Motor", price: 8500.00, quantity: 18, unit: "PCS", maxCap: 25, minReorder: 5, location: "WH-A / Rack 01" },
+      { id: 2, partNo: "PRT-1002", name: "Shielded Control Cable", price: 145.00, quantity: 12.5, unit: "MTR", maxCap: 100, minReorder: 15, location: "WH-A / Spool B2" },
+      { id: 3, partNo: "PRT-1003", name: "Pneumatic Solenoid Valve", price: 3250.00, quantity: 0, unit: "PCS", maxCap: 20, minReorder: 4, location: "WH-B / Shelf C2" },
+      { id: 4, partNo: "PRT-1004", name: "Hydraulic Synthetic Oil", price: 680.00, quantity: 35, unit: "LTR", maxCap: 50, minReorder: 10, location: "WH-B / Drum Bay 1" }
+    ];
+
+    const SAMPLE_TRANSACTIONS = [
+      { id: 101, date: daysAgoISO(6), itemId: 1, partNo: "PRT-1001", itemName: "24V DC Servo Motor", location: "WH-A / Rack 01", type: "IN", quantity: 20, unit: "PCS", source: "SAP", activeQtyAfter: 20, reference: "SAP-PO-45012" },
+      { id: 102, date: daysAgoISO(4), itemId: 1, partNo: "PRT-1001", itemName: "24V DC Servo Motor", location: "WH-A / Rack 01", type: "OUT", quantity: 2, unit: "PCS", source: "E-mail", activeQtyAfter: 18, reference: "Email from Line-2 Maint." },
+      { id: 103, date: daysAgoISO(2), itemId: 2, partNo: "PRT-1002", itemName: "Shielded Control Cable", location: "WH-A / Spool B2", type: "OUT", quantity: 7.5, unit: "MTR", source: "Personal Request", activeQtyAfter: 12.5, reference: "Req: R. Sharma" },
+      { id: 104, date: todayISO(), itemId: 4, partNo: "PRT-1004", itemName: "Hydraulic Synthetic Oil", location: "WH-B / Drum Bay 1", type: "IN", quantity: 35, unit: "LTR", source: "SAP", activeQtyAfter: 35, reference: "SAP-PO-45089" }
+    ];
+
+    let state = { items: [], transactions: [] };
+
+    function saveLocal() {
+      localStorage.setItem(STORAGE_KEYS.ITEMS, JSON.stringify(state.items));
+      localStorage.setItem(STORAGE_KEYS.TX, JSON.stringify(state.transactions));
+    }
+
+    function loadSampleData() {
+      state.items = structuredClone(SAMPLE_ITEMS);
+      state.transactions = structuredClone(SAMPLE_TRANSACTIONS);
+      saveLocal();
+    }
+
+    async function initData() {
+      document.getElementById("storageModeBadge").textContent =
+        CONFIG.USE_BACKEND ? "Connected: ASP.NET + MySQL" : "Local Demo Storage";
+
+      const savedItems = localStorage.getItem(STORAGE_KEYS.ITEMS);
+      const savedTx = localStorage.getItem(STORAGE_KEYS.TX);
+
+      if (savedItems && savedTx) {
+        state.items = JSON.parse(savedItems);
+        state.transactions = JSON.parse(savedTx);
+      } else {
+        loadSampleData();
+      }
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => el.classList.remove("show"), 2600);
+    }
+
+    function formatRupees(num) {
+      return Number(num || 0).toLocaleString("en-IN", {
+        style: "currency",
+        currency: "INR",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function formatQty(qty, unit) {
+      const clean = Number.isInteger(Number(qty)) ? Number(qty) : Number(Number(qty).toFixed(2));
+      return `${clean} ${escapeHtml(unit || "PCS")}`;
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function getStockStatus(item) {
+      const qty = Number(item.quantity || 0);
+      const reorder = Number(item.minReorder ?? 5);
+      if (qty <= 0) return { label: "Out of Stock", cls: "badge-out", fillCls: "fill-out", key: "out" };
+      if (qty <= reorder) return { label: "Low Stock", cls: "badge-low", fillCls: "fill-low", key: "low" };
+      return { label: "Active", cls: "badge-active", fillCls: "fill-active", key: "active" };
+    }
+
+    function renderCapacityMeter(item) {
+      const qty = Number(item.quantity || 0);
+      const cap = Math.max(1, Number(item.maxCap || 50));
+      const pct = Math.min(100, Math.round((qty / cap) * 100));
+      const st = getStockStatus(item);
+      return `
+        <div class="meter-wrap">
+          <div class="meter-label">
+            <span>${qty} / ${cap} ${escapeHtml(item.unit)}</span>
+            <span><strong>${pct}%</strong></span>
+          </div>
+          <div class="meter-bar">
+            <div class="meter-fill ${st.fillCls}" style="width:${pct}%"></div>
+          </div>
+        </div>`;
+    }
+
+    // Tab Navigation
+    function activateTab(tabId) {
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.tab === tabId);
+      });
+      document.querySelectorAll(".tab-panel").forEach((panel) => {
+        panel.classList.toggle("active", panel.id === tabId);
+      });
+      renderAll();
+    }
+
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => activateTab(btn.dataset.tab));
+    });
+
+    document.querySelectorAll("[data-jump-tab]").forEach((btn) => {
+      btn.addEventListener("click", () => activateTab(btn.dataset.jumpTab));
+    });
+
+    // Items CRUD
+    const itemForm = document.getElementById("itemForm");
+    const editingItemId = document.getElementById("editingItemId");
+    const cancelEditItemBtn = document.getElementById("cancelEditItemBtn");
+
+    function resetItemForm() {
+      itemForm.reset();
+      document.getElementById("itemMaxCap").value = 50;
+      document.getElementById("itemMinReorder").value = 5;
+      editingItemId.value = "";
+      document.getElementById("itemFormTitle").textContent = "Add New Item";
+      document.getElementById("saveItemBtn").textContent = "Save Item";
+      cancelEditItemBtn.style.display = "none";
+    }
+
+    cancelEditItemBtn.addEventListener("click", resetItemForm);
+
+    itemForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const partNo = document.getElementById("partNo").value.trim();
+      const name = document.getElementById("itemName").value.trim();
+      const price = parseFloat(document.getElementById("itemPrice").value);
+      const quantity = parseFloat(document.getElementById("itemQty").value);
+      const unit = document.getElementById("itemUnit").value;
+      const maxCap = parseFloat(document.getElementById("itemMaxCap").value);
+      const minReorder = parseFloat(document.getElementById("itemMinReorder").value);
+      const location = document.getElementById("itemLocation").value.trim();
+
+      if (!partNo || !name || isNaN(price) || isNaN(quantity) || !location) return;
+
+      const duplicate = state.items.find(
+        (it) => it.partNo.toLowerCase() === partNo.toLowerCase() && String(it.id) !== editingItemId.value
+      );
+      if (duplicate) {
+        showToast(`Part No "${partNo}" already exists.`);
+        return;
+      }
+
+      if (editingItemId.value) {
+        const id = Number(editingItemId.value);
+        const idx = state.items.findIndex((it) => it.id === id);
+        if (idx !== -1) {
+          state.items[idx] = { ...state.items[idx], partNo, name, price, quantity, unit, maxCap, minReorder, location };
+          showToast("Item updated.");
+        }
+      } else {
+        const nextId = state.items.length ? Math.max(...state.items.map((i) => i.id)) + 1 : 1;
+        state.items.unshift({ id: nextId, partNo, name, price, quantity, unit, maxCap, minReorder, location });
+        showToast("Item added.");
+      }
+
+      saveLocal();
+      resetItemForm();
+      renderAll();
+    });
+
+    function quickAdjustQty(id, delta) {
+      const item = state.items.find((i) => i.id === id);
+      if (!item) return;
+      const nextQty = Math.max(0, Number((item.quantity + delta).toFixed(2)));
+      if (nextQty === item.quantity) return;
+      const actualDelta = Number((nextQty - item.quantity).toFixed(2));
+      item.quantity = nextQty;
+
+      const nextTxId = state.transactions.length ? Math.max(...state.transactions.map((t) => t.id)) + 1 : 101;
+      state.transactions.unshift({
+        id: nextTxId,
+        date: todayISO(),
+        itemId: item.id,
+        partNo: item.partNo,
+        itemName: item.name,
+        location: item.location,
+        type: actualDelta > 0 ? "IN" : "OUT",
+        quantity: Math.abs(actualDelta),
+        unit: item.unit,
+        source: "Personal Request",
+        activeQtyAfter: nextQty,
+        reference: "Quick Stepper Adjust"
+      });
+
+      saveLocal();
+      renderAll();
+      showToast(`${item.partNo}: ${formatQty(nextQty, item.unit)}`);
+    }
+
+    function editItem(id) {
+      const item = state.items.find((i) => i.id === id);
+      if (!item) return;
+      editingItemId.value = item.id;
+      document.getElementById("partNo").value = item.partNo;
+      document.getElementById("itemName").value = item.name;
+      document.getElementById("itemPrice").value = item.price;
+      document.getElementById("itemQty").value = item.quantity;
+      document.getElementById("itemUnit").value = item.unit || "PCS";
+      document.getElementById("itemMaxCap").value = item.maxCap || 50;
+      document.getElementById("itemMinReorder").value = item.minReorder ?? 5;
+      document.getElementById("itemLocation").value = item.location;
+      document.getElementById("itemFormTitle").textContent = `Edit Item — ${item.partNo}`;
+      document.getElementById("saveItemBtn").textContent = "Update Item";
+      cancelEditItemBtn.style.display = "inline-flex";
+      activateTab("items");
+    }
+
+    function deleteItem(id) {
+      state.items = state.items.filter((i) => i.id !== id);
+      saveLocal();
+      showToast("Item removed.");
+      renderAll();
+    }
+
+    // Transactions
+    const txForm = document.getElementById("transactionForm");
+    document.getElementById("txDate").value = todayISO();
+
+    function populateSelects() {
+      const txSel = document.getElementById("txItemSelect");
+      const auditSel = document.getElementById("auditItemSelect");
+      const prevTx = txSel.value;
+      const prevAudit = auditSel.value;
+
+      const options = state.items.length
+        ? state.items
+            .map((it) => `<option value="${it.id}">${escapeHtml(it.partNo)} — ${escapeHtml(it.name)} (${formatQty(it.quantity, it.unit)})</option>`)
+            .join("")
+        : `<option value="">No items available</option>`;
+
+      txSel.innerHTML = options;
+      auditSel.innerHTML = options;
+
+      if (prevTx && state.items.some((i) => String(i.id) === prevTx)) txSel.value = prevTx;
+      if (prevAudit && state.items.some((i) => String(i.id) === prevAudit)) auditSel.value = prevAudit;
+
+      updateTxUnitLabel();
+      updateAuditPreview();
+    }
+
+    function updateTxUnitLabel() {
+      const item = state.items.find((i) => String(i.id) === document.getElementById("txItemSelect").value);
+      document.getElementById("txQtyLabel").textContent = item ? `Quantity (${item.unit}) *` : "Quantity *";
+    }
+
+    document.getElementById("txItemSelect").addEventListener("change", updateTxUnitLabel);
+
+    txForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const itemId = Number(document.getElementById("txItemSelect").value);
+      const type = document.getElementById("txType").value;
+      const qty = parseFloat(document.getElementById("txQty").value);
+      const source = document.getElementById("txSource").value;
+      const date = document.getElementById("txDate").value;
+      const reference = document.getElementById("txReference").value.trim() || "-";
+
+      const item = state.items.find((i) => i.id === itemId);
+      if (!item || isNaN(qty) || qty <= 0) return;
+
+      if (type === "OUT" && item.quantity < qty) {
+        showToast(`Insufficient stock for ${item.partNo} (Available: ${formatQty(item.quantity, item.unit)}).`);
+        return;
+      }
+
+      const newQty = Number((type === "IN" ? item.quantity + qty : item.quantity - qty).toFixed(2));
+      item.quantity = newQty;
+
+      const nextTxId = state.transactions.length ? Math.max(...state.transactions.map((t) => t.id)) + 1 : 101;
+      state.transactions.unshift({
+        id: nextTxId,
+        date,
+        itemId: item.id,
+        partNo: item.partNo,
+        itemName: item.name,
+        location: item.location,
+        type,
+        quantity: qty,
+        unit: item.unit,
+        source,
+        activeQtyAfter: newQty,
+        reference
+      });
+
+      saveLocal();
+      document.getElementById("txQty").value = "";
+      document.getElementById("txReference").value = "";
+      showToast(`Logged ${type} ${formatQty(qty, item.unit)} for ${item.partNo}.`);
+      renderAll();
+    });
+
+    // Physical Quantity Measurement & Audit
+    function updateAuditPreview() {
+      const item = state.items.find((i) => String(i.id) === document.getElementById("auditItemSelect").value);
+      const sysInput = document.getElementById("auditSystemQty");
+      const measuredInput = document.getElementById("auditMeasuredQty");
+
+      if (!item) {
+        sysInput.value = "-";
+        return;
+      }
+
+      sysInput.value = formatQty(item.quantity, item.unit);
+      const measured = measuredInput.value === "" ? item.quantity : parseFloat(measuredInput.value);
+      const diff = Number((measured - item.quantity).toFixed(2));
+      const moneyDiff = diff * item.price;
+      const fillPct = Math.min(100, Math.round((measured / Math.max(1, item.maxCap)) * 100));
+
+      const sign = diff > 0 ? "+" : "";
+      document.getElementById("varianceValue").textContent = `${sign}${diff} ${item.unit}`;
+      document.getElementById("varianceMoney").textContent = `${moneyDiff >= 0 ? "+" : ""}${formatRupees(moneyDiff)}`;
+      document.getElementById("varianceFill").textContent = `${fillPct}% (${measured} / ${item.maxCap} ${item.unit})`;
+    }
+
+    document.getElementById("auditItemSelect").addEventListener("change", () => {
+      document.getElementById("auditMeasuredQty").value = "";
+      updateAuditPreview();
+    });
+    document.getElementById("auditMeasuredQty").addEventListener("input", updateAuditPreview);
+
+    document.getElementById("auditForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const item = state.items.find((i) => String(i.id) === document.getElementById("auditItemSelect").value);
+      const measured = parseFloat(document.getElementById("auditMeasuredQty").value);
+      const source = document.getElementById("auditSource").value;
+
+      if (!item || isNaN(measured) || measured < 0) return;
+
+      const diff = Number((measured - item.quantity).toFixed(2));
+      if (diff === 0) {
+        showToast("Measured quantity matches system record (0 variance).");
+        return;
+      }
+
+      item.quantity = measured;
+      const nextTxId = state.transactions.length ? Math.max(...state.transactions.map((t) => t.id)) + 1 : 101;
+      state.transactions.unshift({
+        id: nextTxId,
+        date: todayISO(),
+        itemId: item.id,
+        partNo: item.partNo,
+        itemName: item.name,
+        location: item.location,
+        type: diff > 0 ? "IN" : "OUT",
+        quantity: Math.abs(diff),
+        unit: item.unit,
+        source,
+        activeQtyAfter: measured,
+        reference: `Stock Measurement Audit (${diff > 0 ? "+" : ""}${diff} ${item.unit})`
+      });
+
+      saveLocal();
+      document.getElementById("auditMeasuredQty").value = "";
+      showToast(`Reconciled ${item.partNo} to ${formatQty(measured, item.unit)}.`);
+      renderAll();
+    });
+
+    // Render Views
+    function renderDashboard() {
+      const totalItems = state.items.length;
+      const totalQty = state.items.reduce((sum, i) => sum + Number(i.quantity || 0), 0);
+      const totalCap = state.items.reduce((sum, i) => sum + Number(i.maxCap || 50), 0);
+      const fillPct = totalCap ? Math.round((totalQty / totalCap) * 100) : 0;
+      const totalValue = state.items.reduce((sum, i) => sum + Number(i.price || 0) * Number(i.quantity || 0), 0);
+
+      let activeCount = 0, lowCount = 0, outCount = 0;
+      state.items.forEach((i) => {
+        const st = getStockStatus(i).key;
+        if (st === "active") activeCount++;
+        else if (st === "low") lowCount++;
+        else outCount++;
+      });
+
+      document.getElementById("kpiTotalItems").textContent = totalItems;
+      document.getElementById("kpiCapacityFill").textContent = `${fillPct}%`;
+      document.getElementById("kpiCapacityDetail").textContent = `${Number(totalQty.toFixed(2))} / ${totalCap} total capacity units`;
+      document.getElementById("kpiTotalValue").textContent = formatRupees(totalValue);
+      document.getElementById("kpiActiveSummary").textContent = `${activeCount} / ${lowCount} / ${outCount}`;
+
+      document.getElementById("dashTrackingBody").innerHTML = state.items.length
+        ? state.items
+            .map((it) => {
+              const st = getStockStatus(it);
+              return `
+                <tr>
+                  <td><strong>${escapeHtml(it.partNo)}</strong></td>
+                  <td>${escapeHtml(it.name)}</td>
+                  <td><strong>${formatQty(it.quantity, it.unit)}</strong></td>
+                  <td>${renderCapacityMeter(it)}</td>
+                  <td><span class="badge ${st.cls}">${st.label}</span></td>
+                </tr>`;
+            })
+            .join("")
+        : `<tr><td colspan="5" class="empty-row">No items found.</td></tr>`;
+
+      const recentTx = state.transactions.slice(0, 6);
+      document.getElementById("dashRecentTxBody").innerHTML = recentTx.length
+        ? recentTx
+            .map((tx) => `
+              <tr>
+                <td>${escapeHtml(tx.date)}</td>
+                <td><strong>${escapeHtml(tx.partNo)}</strong></td>
+                <td><span class="badge ${tx.type === "IN" ? "badge-in" : "badge-out-tx"}">${tx.type}</span></td>
+                <td>${formatQty(tx.quantity, tx.unit)}</td>
+                <td><span class="badge badge-source">${escapeHtml(tx.source)}</span></td>
+              </tr>`)
+            .join("")
+        : `<tr><td colspan="5" class="empty-row">No transactions recorded yet.</td></tr>`;
+    }
+
+    function renderItems() {
+      const q = document.getElementById("itemSearchInput").value.trim().toLowerCase();
+      const filtered = state.items.filter(
+        (it) =>
+          !q ||
+          it.partNo.toLowerCase().includes(q) ||
+          it.name.toLowerCase().includes(q) ||
+          it.location.toLowerCase().includes(q)
+      );
+
+      document.getElementById("itemsTableBody").innerHTML = filtered.length
+        ? filtered
+            .map((it) => {
+              const st = getStockStatus(it);
+              return `
+                <tr>
+                  <td><strong>${escapeHtml(it.partNo)}</strong></td>
+                  <td>${escapeHtml(it.name)}</td>
+                  <td>${formatRupees(it.price)}</td>
+                  <td><strong>${formatQty(it.quantity, it.unit)}</strong></td>
+                  <td>
+                    <div class="qty-stepper">
+                      <button class="btn-xs" type="button" onclick="quickAdjustQty(${it.id}, -1)">-1</button>
+                      <button class="btn-xs" type="button" onclick="quickAdjustQty(${it.id}, 1)">+1</button>
+                    </div>
+                  </td>
+                  <td>${renderCapacityMeter(it)}</td>
+                  <td>${escapeHtml(it.location)}</td>
+                  <td><span class="badge ${st.cls}">${st.label}</span></td>
+                  <td>
+                    <button class="btn btn-secondary" style="padding:5px 10px;font-size:12px;" onclick="editItem(${it.id})">Edit</button>
+                    <button class="btn btn-danger" onclick="deleteItem(${it.id})">Delete</button>
+                  </td>
+                </tr>`;
+            })
+            .join("")
+        : `<tr><td colspan="9" class="empty-row">No matching items found.</td></tr>`;
+    }
+
+    function renderUomSummary() {
+      const groups = {};
+      state.items.forEach((it) => {
+        const u = it.unit || "PCS";
+        if (!groups[u]) groups[u] = { unit: u, count: 0, qty: 0, cap: 0, value: 0 };
+        groups[u].count += 1;
+        groups[u].qty += Number(it.quantity || 0);
+        groups[u].cap += Number(it.maxCap || 50);
+        groups[u].value += Number(it.price || 0) * Number(it.quantity || 0);
+      });
+
+      const rows = Object.values(groups);
+      document.getElementById("uomSummaryTableBody").innerHTML = rows.length
+        ? rows
+            .map((g) => {
+              const pct = g.cap ? Math.round((g.qty / g.cap) * 100) : 0;
+              return `
+                <tr>
+                  <td><strong>${escapeHtml(g.unit)}</strong></td>
+                  <td>${g.count}</td>
+                  <td><strong>${Number(g.qty.toFixed(2))} ${escapeHtml(g.unit)}</strong></td>
+                  <td>${g.cap} ${escapeHtml(g.unit)}</td>
+                  <td>${pct}%</td>
+                  <td>${formatRupees(g.value)}</td>
+                </tr>`;
+            })
+            .join("")
+        : `<tr><td colspan="6" class="empty-row">No items available.</td></tr>`;
+    }
+
+    function renderTransactionsAndTracking() {
+      const fromDate = document.getElementById("filterFromDate").value;
+      const toDate = document.getElementById("filterToDate").value;
+      const sourceFilter = document.getElementById("filterSource").value;
+      const textFilter = document.getElementById("filterText").value.trim().toLowerCase();
+
+      const filteredTx = state.transactions.filter((tx) => {
+        if (fromDate && tx.date < fromDate) return false;
+        if (toDate && tx.date > toDate) return false;
+        if (sourceFilter !== "ALL" && tx.source !== sourceFilter) return false;
+        if (textFilter) {
+          const hay = `${tx.partNo} ${tx.itemName} ${tx.location} ${tx.reference} ${tx.source}`.toLowerCase();
+          if (!hay.includes(textFilter)) return false;
+        }
+        return true;
+      });
+
+      document.getElementById("filteredTxTableBody").innerHTML = filteredTx.length
+        ? filteredTx
+            .map((tx) => `
+              <tr>
+                <td>#${tx.id}</td>
+                <td>${escapeHtml(tx.date)}</td>
+                <td><strong>${escapeHtml(tx.partNo)}</strong></td>
+                <td>${escapeHtml(tx.itemName)}</td>
+                <td>${escapeHtml(tx.location)}</td>
+                <td><span class="badge ${tx.type === "IN" ? "badge-in" : "badge-out-tx"}">${tx.type}</span></td>
+                <td><strong>${formatQty(tx.quantity, tx.unit)}</strong></td>
+                <td><span class="badge badge-source">${escapeHtml(tx.source)}</span></td>
+                <td><strong>${formatQty(tx.activeQtyAfter, tx.unit)}</strong></td>
+                <td>${escapeHtml(tx.reference)}</td>
+              </tr>`)
+            .join("")
+        : `<tr><td colspan="10" class="empty-row">No transactions match the selected date/source filters.</td></tr>`;
+
+      document.getElementById("activeTrackingTableBody").innerHTML = state.items.length
+        ? state.items
+            .map((it) => {
+              const st = getStockStatus(it);
+              return `
+                <tr>
+                  <td><strong>${escapeHtml(it.partNo)}</strong></td>
+                  <td>${escapeHtml(it.name)}</td>
+                  <td>${escapeHtml(it.location)}</td>
+                  <td>${formatRupees(it.price)}</td>
+                  <td><strong>${formatQty(it.quantity, it.unit)}</strong></td>
+                  <td>${renderCapacityMeter(it)}</td>
+                  <td>${formatRupees(it.price * it.quantity)}</td>
+                  <td><span class="badge ${st.cls}">${st.label}</span></td>
+                </tr>`;
+            })
+            .join("")
+        : `<tr><td colspan="8" class="empty-row">No items to track.</td></tr>`;
+    }
+
+    function renderAll() {
+      populateSelects();
+      renderDashboard();
+      renderItems();
+      renderUomSummary();
+      renderTransactionsAndTracking();
+    }
+
+    ["filterFromDate", "filterToDate", "filterSource", "filterText"].forEach((id) => {
+      document.getElementById(id).addEventListener("input", renderTransactionsAndTracking);
+      document.getElementById(id).addEventListener("change", renderTransactionsAndTracking);
+    });
+
+    document.getElementById("clearFiltersBtn").addEventListener("click", () => {
+      document.getElementById("filterFromDate").value = "";
+      document.getElementById("filterToDate").value = "";
+      document.getElementById("filterSource").value = "ALL";
+      document.getElementById("filterText").value = "";
+      renderTransactionsAndTracking();
+    });
+
+    document.getElementById("itemSearchInput").addEventListener("input", renderItems);
+
+    document.getElementById("resetDemoBtn").addEventListener("click", () => {
+      loadSampleData();
+      resetItemForm();
+      showToast("Sample inventory data restored.");
+      renderAll();
+    });
+
+    (async function boot() {
+      await initData();
+      renderAll();
+    })();
+  </script>
+</body>
+</html>
