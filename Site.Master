@@ -1,0 +1,70 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Site.Master.cs" Inherits="StockInventorySystem.SiteMaster" %>
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%: Page.Title %> - Stock & Inventory Management System</title>
+    <link rel="stylesheet" href="~/Content/site.css" runat="server" />
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="mainForm" runat="server">
+        <!-- Top App Header -->
+        <header class="app-header">
+            <div class="header-container">
+                <a href="Default.aspx" class="brand-section">
+                    <div class="brand-icon">📦</div>
+                    <div class="brand-text">
+                        <h1>Stock &amp; Inventory Management</h1>
+                        <p>Local Office Intranet System &bull; MySQL &amp; SQLyog Connected</p>
+                    </div>
+                </a>
+                <div class="intranet-badge">
+                    <span class="intranet-dot"></span>
+                    <span>Intranet Host: <%: Environment.MachineName %></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-bar">
+            <div class="nav-container">
+                <a href="Default.aspx" class="nav-link <%: GetNavClass("Default.aspx") %>">
+                    <span>📊</span>
+                    <span>1. Dashboard</span>
+                </a>
+                <a href="ItemMaster.aspx" class="nav-link <%: GetNavClass("ItemMaster.aspx") %>">
+                    <span>📑</span>
+                    <span>2. Item Master</span>
+                </a>
+                <a href="TransactionMaster.aspx" class="nav-link <%: GetNavClass("TransactionMaster.aspx") %>">
+                    <span>⚡</span>
+                    <span>3. Transaction Master &amp; Active Stock</span>
+                </a>
+                <a href="TransactionDetails.aspx" class="nav-link <%: GetNavClass("TransactionDetails.aspx") %>">
+                    <span>🔍</span>
+                    <span>4. Transaction Details &amp; Date Search</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Workspace -->
+        <main class="main-wrapper">
+            <asp:ContentPlaceHolder ID="MainContent" runat="server">
+            </asp:ContentPlaceHolder>
+        </main>
+
+        <!-- App Footer -->
+        <footer class="app-footer">
+            <p>&copy; <%: DateTime.Now.Year %> Stock &amp; Inventory Management System &bull; IIS Localhost Intranet Deployment &bull; Server Time: <%: DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") %></p>
+        </footer>
+    </form>
+
+    <!-- Client Script (Zero external CDN) -->
+    <script src="<%= ResolveUrl("~/Scripts/app.js") %>"></script>
+    <asp:ContentPlaceHolder ID="ScriptContent" runat="server">
+    </asp:ContentPlaceHolder>
+</body>
+</html>
